@@ -235,6 +235,8 @@ public:
         f_ = std::stringstream(s, std::ios_base::in | std::ios_base::out);
     }
 
+    void Dump() {}
+
     ~FakeDisk() {}
 
     void Read(uint64_t begin, uint8_t* memcache, uint64_t length) override

@@ -52,7 +52,7 @@ namespace fs = ghc::filesystem;
 const uint32_t kOffsetSize = 10;
 
 // Number of buckets to use for SortOnDisk.
-const uint32_t kNumSortBuckets = 16;
+const int32_t kNumSortBuckets = 16;
 const uint32_t kLogNumSortBuckets = 4;
 
 // During backprop and compress, the write pointer is ahead of the read pointer
@@ -175,7 +175,7 @@ void* thread(void* arg)
         uint64_t left_reader = pos * entry_size_bytes;
     uint64_t left_writer_count = 0;
 uint64_t fake_left_writer_count = 0;
-        uint64_t right_writer_count = 0;
+        int64_t right_writer_count = 0;
         uint64_t matches = 0;       // Total matches
 
 	uint64_t ignorebucket = 0xffffffffffffffff;
@@ -560,11 +560,12 @@ PlotEntry left_entry;
                     Util::SliceInt64FromBytes(right_writer_buf+i*right_entry_size_bytes, k + kExtraBits + pos_size, kOffsetSize );
 
                 if (right_entry_size_bytes*8-k - kExtraBits - pos_size - kOffsetSize <= 128) {
-                    left_entry.left_metadata = Util::SliceInt128FromBytes( 
+                    left_entry.left_metadata = Util::SliceInt128FromBytes(
                         right_writer_buf+i*right_entry_size_bytes, k + kExtraBits + pos_size + kOffsetSize, right_entry_size_bytes*8-k - kExtraBits - pos_size - kOffsetSize);
+                    left_entry.right_metadata = uint128_t{}; // XXX check that this makes sense!
                 } else {
                     // Large metadatas that don't fit into 128 bits. (k > 32).
-                    left_entry.left_metadata = Util::SliceInt128FromBytes( 
+                    left_entry.left_metadata = Util::SliceInt128FromBytes(
                         right_writer_buf+i*right_entry_size_bytes, k - kExtraBits - pos_size - kOffsetSize, 128);
                     left_entry.right_metadata = Util::SliceInt128FromBytes(
                         right_writer_buf+i*right_entry_size_bytes,

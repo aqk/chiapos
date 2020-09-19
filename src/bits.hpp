@@ -25,6 +25,8 @@
 
 using namespace std;
 
+#define UNUSED(x) ((void)(x))
+
 // 64 * 2^16. 2^17 values, each value can store 64 bits.
 #define kMaxSizeBits 8388608
 
@@ -309,7 +311,7 @@ public:
                 // Otherwise, search for the first bucket that isn't full of 1 bits.
                 for (int16_t i = values_.size() - 2; i >= 0; i--)
                     if (values_[i] != limit) {
-                        all_one = false;
+                        all_one = false; // XXX should this be checked for more than one iteration of the loop?
                         // Increment it.
                         values_[i]++;
                         // Buckets that were full of 1 bits turn all to 0 bits.
@@ -321,6 +323,7 @@ public:
             // This isn't allowed, as the Bits size must remain constant during all the plotting
             // process.
             assert(all_one == false);
+            UNUSED(all_one);
         }
         return *this;
     }
